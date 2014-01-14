@@ -9,7 +9,7 @@ An improved ChannelLogger:
   formatting
 * All times are in UTC
 
-Tested with Libnoria and Python 3.2
+Tested with Limnoria and Python 3.2
 
 TODO:
 * Edit page title in HTML template to include file name (channel name + date)
