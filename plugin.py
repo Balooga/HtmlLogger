@@ -30,10 +30,6 @@
 Channel Logger that produces HTML files.
 '''
 
-### TODO ###
-# Edit page title in HTML template to include file name (channel name + date)
-############
-
 import html
 import os
 import shutil
@@ -57,7 +53,6 @@ notice_class = "style-notice"
 timestamp_class = "style-tz"
 nick_class = "style-nick"
 message_class = "style-msg"
-header_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), "header.html")
 
 class FakeLog(object):
     def flush(self):
@@ -79,8 +74,9 @@ class HtmlLogger(callbacks.Plugin):
         world.flushers.append(self.flusher)
 
     def die(self):
+        self.log.debug('Logging is dying.')
         for log in self._logs():
-            log.close()
+            self.endLog(log)
         world.flushers = [x for x in world.flushers if x is not self.flusher]
 
     def __call__(self, irc, msg):
@@ -98,8 +94,9 @@ class HtmlLogger(callbacks.Plugin):
             self.lastMsgs[irc] = msg
 
     def reset(self):
+        self.log.debug('Reset all logs.')
         for log in self._logs():
-            log.close()
+            self.endLog(log)
         self.logs.clear()
         self.lastMsgs.clear()
         self.lastStates.clear()
@@ -108,6 +105,35 @@ class HtmlLogger(callbacks.Plugin):
         for logs in self.logs.values():
             for log in logs.values():
                 yield log
+
+    def startLog(self, logPath):
+        self.log.info('Starting new log file: %s.' % logPath)
+        header_template = self.registryValue('headerfile')
+        if header_template == '':
+            header_template = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                           "header.html")
+        self.log.debug('Using header template from %s.' % header_template)
+        shutil.copyfile(header_template, logPath)
+
+    def getFooter(self):
+        ''' Reads the footer, and returns it as a string for appending to the
+            log file.
+        '''
+        footer_template = self.registryValue('footerfile')
+        if footer_template == '':
+            footer_template = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                           "footer.html")
+        self.log.debug('Using footer template from %s.' % footer_template)
+        footerString = ''
+        with open(footer_template, 'r') as footerFile:
+            footerString = footerFile.read()
+        return footerString
+
+    def endLog(self, log):
+        self.log.debug('Closing log file.')
+        footerString = self.getFooter()
+        log.write(footerString)
+        log.close()
 
     def flush(self):
         self.checkLogNames()
@@ -149,8 +175,11 @@ class HtmlLogger(callbacks.Plugin):
             for (channel, log) in list(logs.items()):
                 if self.registryValue('rotateLogs', channel):
                     name = self.getLogName(channel)
-                    if name != log.name:
-                        log.close()
+                    self.log.error(name)
+                    self.log.error(os.path.basename(log.name))
+                    if name != os.path.basename(log.name):
+                        self.log.debug('Timestamp change. Start new log.')
+                        self.endLog(log)
                         del logs[channel]
                         number2keep = self.registryValue('deleteOldLogs', channel)
                         if number2keep > 0:
@@ -185,8 +214,15 @@ class HtmlLogger(callbacks.Plugin):
                 logDir = self.getLogDir(irc, channel)
                 logPath = os.path.join(logDir, name)
                 if not os.path.isfile(logPath):
-                    self.log.info('Starting new log file: %s.' % logPath)
-                    shutil.copyfile(header_template, logPath)
+                    self.startLog(logPath)
+                else: # Remove the footer if it is there
+                    # This will not work with huge log files
+                    with open(logPath, 'r') as logFile:
+                        logFileString = logFile.read()
+                    footerString = self.getFooter()
+                    if logFileString.endswith(footerString):
+                        with open(logPath, 'w') as logFile:
+                            logFile.write(logFileString[:-len(footerString)])
                 log = open(logPath, 'a')
                 logs[channel] = log
                 return log

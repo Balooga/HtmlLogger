@@ -6,11 +6,16 @@ Supybot Plugin for creating HTML channel logs.
 An improved ChannelLogger:
 * Delete old conversations
 * Output log in a format suitable for inclusion into a web page with CSS
-  formatting
+  formatting, and embed that log into an HTML template
 * All times are in UTC
 
-Tested with Limnoria and Python 3.2
+Notes:
+* Tested with Limnoria and Python 3.2
+* Currently the same header and footer templates are used for all channels
 
 TODO:
-* Edit page title in HTML template to include file name (channel name + date)
-* Localitazion files are still for ChannelLogger
+* Insert into HTML template information like channel name + date
+* Allow an authenticated user to opt out of channel logging
+* Localization files are still for ChannelLogger
+* Linkify URLs
+* Encoding problems

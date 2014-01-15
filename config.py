@@ -74,7 +74,6 @@ conf.registerChannelValue(HtmlLogger, 'filenameTimestamp',
     for the timestamp are in the time.strftime docs at python.org.  In order
     for your logs to be rotated, you'll also have to enable
     supybot.plugins.HtmlLogger.rotateLogs.""")))
-
 conf.registerGlobalValue(HtmlLogger, 'directories',
     registry.Boolean(True, _("""Determines whether the bot will partition its
     channel logs into separate directories based on different criteria.""")))
@@ -92,5 +91,15 @@ conf.registerGlobalValue(HtmlLogger.directories.timestamp, 'format',
     registry.String('%B', _("""Determines what timestamp format will be used in
     the directory structure for channel logs if
     supybot.plugins.HtmlLogger.directories.timestamp is True.""")))
+conf.registerGlobalValue(HtmlLogger, 'headerfile',
+    registry.String('', _("""Location of the HTML header to wrap around a log
+    file. If none is specified, the default header included with the plugin will be
+    used.""")))
+conf.registerGlobalValue(HtmlLogger, 'footerfile',
+    registry.String('', _("""Location of the HTML footer to wrap around a log
+    file. If none is specified, the default footer included with the plugin will be
+    used.""")))
+
+
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
