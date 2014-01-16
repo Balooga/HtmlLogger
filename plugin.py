@@ -37,11 +37,9 @@ import shutil
 import time
 
 if sys.version_info[0] >= 3:
-    from io import StringIO
     from html import escape as html_escape
     bin_mode = ''
 else:
-    from cStringIO import StringIO
     from xml.sax.saxutils import escape as html_escape
     from io import open
     bin_mode = 'b'
