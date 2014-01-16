@@ -18,6 +18,5 @@ TODO:
 * Insert into HTML template information like channel name + date
 * Allow an authenticated user to opt out of channel logging
 * Localization files are still for ChannelLogger
-* Encoding problems
 * Improve the linkify regex
 * Unit tests, especially for linkify
