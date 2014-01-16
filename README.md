@@ -11,13 +11,12 @@ An improved ChannelLogger:
 * Turns URLs into links
 
 Notes:
-* Tested with Limnoria and Python 3.2
+* Tested with Limnoria and Python 3.2, and Supybot and Python 2.7.
 * Currently the same header and footer templates are used for all channels
 
 TODO:
 * Insert into HTML template information like channel name + date
 * Allow an authenticated user to opt out of channel logging
 * Localization files are still for ChannelLogger
-* Encoding problems
 * Improve the linkify regex
 * Unit tests, especially for linkify
