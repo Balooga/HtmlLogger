@@ -45,8 +45,14 @@ import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.registry as registry
 import supybot.callbacks as callbacks
-from supybot.i18n import PluginInternationalization, internationalizeDocstring
-_ = PluginInternationalization('HtmlLogger')
+try:
+    from supybot.i18n import PluginInternationalization, internationalizeDocstring
+    _ = PluginInternationalization('HtmlLogger')
+except:
+    # This are useless functions that's allow to run the plugin on a bot
+    # without the i18n plugin
+    _ = lambda x:x
+    internationalizeDocstring = lambda x:x
 
 # This regex doesn't match every URL, but it is simple and gets most.
 url_regex = re.compile("\s*([fhtps]{3,5}://\S+)\s*")
