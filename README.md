@@ -15,6 +15,7 @@ Notes:
 * Currently the same header and footer templates are used for all channels
 
 TODO:
+* HTML log file isn't closed correctly when receiving a kill signal
 * Insert into HTML template information like channel name + date
 * Allow an authenticated user to opt out of channel logging
 * Localization files are still for ChannelLogger
