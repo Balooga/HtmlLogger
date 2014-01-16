@@ -8,6 +8,7 @@ An improved ChannelLogger:
 * Output log in a format suitable for inclusion into a web page with CSS
   formatting, and embed that log into an HTML template
 * All times are in UTC
+* Turns URLs into links
 
 Notes:
 * Tested with Limnoria and Python 3.2
@@ -17,5 +18,6 @@ TODO:
 * Insert into HTML template information like channel name + date
 * Allow an authenticated user to opt out of channel logging
 * Localization files are still for ChannelLogger
-* Linkify URLs
 * Encoding problems
+* Improve the linkify regex
+* Unit tests, especially for linkify

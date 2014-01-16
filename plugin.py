@@ -32,6 +32,7 @@ Channel Logger that produces HTML files.
 
 import html
 import os
+import re
 import shutil
 import time
 from io import StringIO
@@ -46,6 +47,9 @@ import supybot.registry as registry
 import supybot.callbacks as callbacks
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
 _ = PluginInternationalization('HtmlLogger')
+
+# This regex doesn't match every URL, but it is simple and gets most.
+url_regex = re.compile("\s*([fhtps]{3,5}://\S+)\s*")
 
 file_suffix = "html"
 row_class = "style-row"
@@ -237,6 +241,10 @@ class HtmlLogger(callbacks.Plugin):
     def normalizeChannel(self, irc, channel):
         return ircutils.toLower(channel)
 
+    def linkify(self, message):
+        '''Enclose all URLs in the message with an href.'''
+        return url_regex.sub(r'<a href="\1">\1</a>', message)
+
     def doLog(self, irc, channel, notice, nick, s, *args):
         ''' notice: Boolean. True if message should be styled as a notice. '''
         if not self.registryValue('enable', channel):
@@ -259,7 +267,7 @@ class HtmlLogger(callbacks.Plugin):
         if self.registryValue('stripFormatting', channel):
             s = ircutils.stripFormatting(s)
         log.write('<span class="%s">' % message_class)
-        log.write(html.escape(s))
+        log.write(self.linkify(html.escape(s)))
         log.write('</span>')
         log.write('</p>\n')
         if self.registryValue('flushImmediately'):
