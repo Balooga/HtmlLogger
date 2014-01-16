@@ -175,8 +175,6 @@ class HtmlLogger(callbacks.Plugin):
             for (channel, log) in list(logs.items()):
                 if self.registryValue('rotateLogs', channel):
                     name = self.getLogName(channel)
-                    self.log.error(name)
-                    self.log.error(os.path.basename(log.name))
                     if name != os.path.basename(log.name):
                         self.log.debug('Timestamp change. Start new log.')
                         self.endLog(log)
