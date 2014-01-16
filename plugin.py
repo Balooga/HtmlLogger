@@ -30,12 +30,19 @@
 Channel Logger that produces HTML files.
 '''
 
-import html
 import os
 import re
+import sys
 import shutil
 import time
-from io import StringIO
+
+if sys.version_info[0] >= 3:
+    from html import escape as html_escape
+    bin_mode = ''
+else:
+    from xml.sax.saxutils import escape as html_escape
+    from io import open
+    bin_mode = 'b'
 
 import supybot.conf as conf
 import supybot.world as world
@@ -45,8 +52,14 @@ import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.registry as registry
 import supybot.callbacks as callbacks
-from supybot.i18n import PluginInternationalization, internationalizeDocstring
-_ = PluginInternationalization('HtmlLogger')
+try:
+    from supybot.i18n import PluginInternationalization, internationalizeDocstring
+    _ = PluginInternationalization('HtmlLogger')
+except:
+    # This are useless functions that's allow to run the plugin on a bot
+    # without the i18n plugin
+    _ = lambda x:x
+    internationalizeDocstring = lambda x:x
 
 # This regex doesn't match every URL, but it is simple and gets most.
 url_regex = re.compile("\s*([fhtps]{3,5}://\S+)\s*")
@@ -129,7 +142,7 @@ class HtmlLogger(callbacks.Plugin):
                                            "footer.html")
         self.log.debug('Using footer template from %s.' % footer_template)
         footerString = ''
-        with open(footer_template, encoding='utf-8', mode='r') as footerFile:
+        with open(footer_template, encoding='utf-8', mode='r'+bin_mode) as footerFile:
             footerString = footerFile.read()
         return footerString
 
@@ -219,13 +232,13 @@ class HtmlLogger(callbacks.Plugin):
                     self.startLog(logPath)
                 else: # Remove the footer if it is there
                     # This will not work with huge log files
-                    with open(logPath, encoding='utf-8', mode='r') as logFile:
+                    with open(logPath, encoding='utf-8', mode='r'+bin_mode) as logFile:
                         logFileString = logFile.read()
                     footerString = self.getFooter()
                     if logFileString.endswith(footerString):
-                        with open(logPath, encoding='utf-8', mode='w') as logFile:
+                        with open(logPath, encoding='utf-8', mode='w'+bin_mode) as logFile:
                             logFile.write(logFileString[:-len(footerString)])
-                log = open(logPath, encoding='utf-8', mode='a')
+                log = open(logPath, encoding='utf-8', mode='a'+bin_mode)
                 logs[channel] = log
                 return log
             except IOError:
@@ -262,12 +275,12 @@ class HtmlLogger(callbacks.Plugin):
             log.write('</span>')
         if nick != None:
             log.write('<span class="%s">' % nick_class)
-            log.write(html.escape("<%s> " %nick))
+            log.write(html_escape("<%s> " %nick))
             log.write('</span>')
         if self.registryValue('stripFormatting', channel):
             s = ircutils.stripFormatting(s)
         log.write('<span class="%s">' % message_class)
-        log.write(self.linkify(html.escape(s)))
+        log.write(self.linkify(html_escape(s)))
         log.write('</span>')
         log.write('</p>\n')
         if self.registryValue('flushImmediately'):

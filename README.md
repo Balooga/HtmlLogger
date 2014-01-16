@@ -11,7 +11,7 @@ An improved ChannelLogger:
 * Turns URLs into links
 
 Notes:
-* Tested with Limnoria and Python 3.2
+* Tested with Limnoria and Python 3.2, and Supybot and Python 2.7.
 * Currently the same header and footer templates are used for all channels
 
 TODO:
