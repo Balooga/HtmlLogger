@@ -80,23 +80,9 @@ conf.registerChannelValue(HtmlLogger, 'filenameTimestamp',
     for the timestamp are in the time.strftime docs at python.org.  In order
     for your logs to be rotated, you'll also have to enable
     supybot.plugins.HtmlLogger.rotateLogs.""")))
-conf.registerGlobalValue(HtmlLogger, 'directories',
-    registry.Boolean(True, _("""Determines whether the bot will partition its
-    channel logs into separate directories based on different criteria.""")))
-conf.registerGlobalValue(HtmlLogger.directories, 'network',
-    registry.Boolean(True, _("""Determines whether the bot will use a network
-    directory if using directories.""")))
-conf.registerGlobalValue(HtmlLogger.directories, 'channel',
-    registry.Boolean(True, _("""Determines whether the bot will use a channel
-    directory if using directories.""")))
-conf.registerGlobalValue(HtmlLogger.directories, 'timestamp',
-    registry.Boolean(False, _("""Determines whether the bot will use a timestamp
-    (determined by supybot.plugins.HtmlLogger.directories.timestamp.format)
-    if using directories.""")))
-conf.registerGlobalValue(HtmlLogger.directories.timestamp, 'format',
-    registry.String('%B', _("""Determines what timestamp format will be used in
-    the directory structure for channel logs if
-    supybot.plugins.HtmlLogger.directories.timestamp is True.""")))
+conf.registerGlobalValue(HtmlLogger, 'networkDirectory',
+    registry.Boolean(True, _("""Determines whether the bot will partition the
+    directories of channel logs into separate network directories.""")))
 conf.registerGlobalValue(HtmlLogger, 'logURL',
     registry.String('', _("""URL of the directory where log files will be
     publicly accessible.""")))

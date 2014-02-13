@@ -208,15 +208,9 @@ class HtmlLogger(callbacks.Plugin):
 
     def getLogDir(self, irc, channel):
         logDir = conf.supybot.directories.log.dirize(self.name())
-        if self.registryValue('directories'):
-            if self.registryValue('directories.network'):
+        if self.registryValue('networkDirectory'):
                 logDir = os.path.join(logDir,  irc.network)
-            if self.registryValue('directories.channel'):
-                logDir = os.path.join(logDir, channel)
-            if self.registryValue('directories.timestamp'):
-                format = self.registryValue('directories.timestamp.format')
-                timeDir =time.strftime(format, time.gmtime())
-                logDir = os.path.join(logDir, timeDir)
+        logDir = os.path.join(logDir, channel)
         if not os.path.exists(logDir):
             os.makedirs(logDir)
         return logDir
