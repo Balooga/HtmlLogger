@@ -97,6 +97,9 @@ conf.registerGlobalValue(HtmlLogger.directories.timestamp, 'format',
     registry.String('%B', _("""Determines what timestamp format will be used in
     the directory structure for channel logs if
     supybot.plugins.HtmlLogger.directories.timestamp is True.""")))
+conf.registerGlobalValue(HtmlLogger, 'logURL',
+    registry.String('', _("""URL of the directory where log files will be
+    publicly accessible.""")))
 conf.registerGlobalValue(HtmlLogger, 'headerfile',
     registry.String('', _("""Location of the HTML header to wrap around a log
     file. If none is specified, the default header included with the plugin will be

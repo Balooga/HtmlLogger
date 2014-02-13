@@ -64,6 +64,7 @@ except:
 # This regex doesn't match every URL, but it is simple and gets most.
 url_regex = re.compile("\s*([fhtps]{3,5}://\S+)\s*")
 
+file_prefix = "log"
 file_suffix = "html"
 row_class = "style-row"
 notice_class = "style-notice"
@@ -123,26 +124,57 @@ class HtmlLogger(callbacks.Plugin):
             for log in logs.values():
                 yield log
 
+    def getTemplatePath(self, template_name):
+        registry_value = ''
+        default_name = ''
+        if template_name == 'header':
+            registry_value = 'headerfile'
+            default_name = 'header.html'
+        elif template_name == 'footer':
+            registry_value = 'footerfile'
+            default_name = 'footer.html'
+        templatePath = self.registryValue(registry_value)
+        if templatePath == '':
+            templatePath = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                                        default_name)
+        return templatePath
+
     def startLog(self, logPath):
         self.log.info('Starting new log file: %s.' % logPath)
-        header_template = self.registryValue('headerfile')
-        if header_template == '':
-            header_template = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                           "header.html")
-        self.log.debug('Using header template from %s.' % header_template)
-        shutil.copyfile(header_template, logPath)
+        templatePath = self.getTemplatePath('header')
+        self.log.debug('Using header template from %s.' % templatePath)
+        shutil.copyfile(templatePath, logPath)
+        with open(logPath, encoding='utf-8', mode='a'+bin_mode) as logFile:
+            logFile.write("<h2>Daily Log</h2>\n")
+
+    def generateIndex(self, logDir):
+        self.log.info('Generating a new index.html in %s.' % logDir)
+        templatePath = self.getTemplatePath('header')
+        self.log.debug('Using header template from %s.' % templatePath)
+        indexPath = os.path.join(logDir, 'index.html')
+        shutil.copyfile(templatePath, indexPath)
+        logFiles = [f for f in os.listdir(logDir)
+                      if os.path.isfile(os.path.join(logDir, f))
+                           and f.startswith(file_prefix+"_")
+                           and f.endswith("."+file_suffix)]
+        logFiles.sort(reverse=True)
+        logURL = self.registryValue("logURL")
+        with open(indexPath, encoding='utf-8', mode='a'+bin_mode) as indexFile:
+            indexFile.write("<h2>Daily Logs</h2>\n")
+            indexFile.write("<ul>\n")
+            for f in logFiles:
+                indexFile.write('\t<li><a href="%s/%s">%s</a></li>\n' %(logURL,f,f))
+            indexFile.write("</ul>")
+            indexFile.write("</html>\n</body>")
 
     def getFooter(self):
         ''' Reads the footer, and returns it as a string for appending to the
             log file.
         '''
-        footer_template = self.registryValue('footerfile')
-        if footer_template == '':
-            footer_template = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                           "footer.html")
-        self.log.debug('Using footer template from %s.' % footer_template)
+        templatePath = self.getTemplatePath('footer')
+        self.log.debug('Using footer template from %s.' % templatePath)
         footerString = ''
-        with open(footer_template, encoding='utf-8', mode='r'+bin_mode) as footerFile:
+        with open(templatePath, encoding='utf-8', mode='r'+bin_mode) as footerFile:
             footerString = footerFile.read()
         return footerString
 
@@ -167,10 +199,10 @@ class HtmlLogger(callbacks.Plugin):
 
     def getLogName(self, channel):
         if self.registryValue('rotateLogs', channel):
-            return '%s.%s.%s' % (channel, self.logNameTimestamp(channel),
-                                 file_suffix)
+            return '%s_%s_%s.%s' % (file_prefix, channel,
+                                    self.logNameTimestamp(channel), file_suffix)
         else:
-            return '%s.%s' % (channel, file_suffix)
+            return '%s_%s.%s' % (file_prefix, channel, file_suffix)
 
     def getLogDir(self, irc, channel):
         logDir = conf.supybot.directories.log.dirize(self.name())
@@ -193,17 +225,15 @@ class HtmlLogger(callbacks.Plugin):
                 if self.registryValue('rotateLogs', channel):
                     name = self.getLogName(channel)
                     if name != os.path.basename(log.name):
-                        self.log.debug('Timestamp change. Start new log.')
+                        self.log.debug('Timestamp change. Close the log.')
                         self.endLog(log)
                         del logs[channel]
-                        number2keep = self.registryValue('deleteOldLogs', channel)
-                        if number2keep > 0:
-                            self.deleteOldLogs(irc, channel, number2keep)
 
     def deleteOldLogs(self, irc, channel, number2keep):
         logDir = self.getLogDir(irc, channel)
         logFiles = [f for f in os.listdir(logDir)
                             if os.path.isfile(os.path.join(logDir, f))
+                               and f.startswith(file_prefix+"_")
                                and f.endswith("."+file_suffix)]
         logFiles.sort(reverse=True)
         need2delete = logFiles[number2keep:]
@@ -230,6 +260,12 @@ class HtmlLogger(callbacks.Plugin):
                 logPath = os.path.join(logDir, name)
                 if not os.path.isfile(logPath):
                     self.startLog(logPath)
+                    # Clean up old log files
+                    number2keep = self.registryValue('deleteOldLogs', channel)
+                    if number2keep > 0:
+                        self.deleteOldLogs(irc, channel, number2keep)
+                    # Generate a new index file
+                    self.generateIndex(logDir)
                 else: # Remove the footer if it is there
                     # This will not work with huge log files
                     with open(logPath, encoding='utf-8', mode='r'+bin_mode) as logFile:
