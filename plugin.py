@@ -139,13 +139,13 @@ class HtmlLogger(callbacks.Plugin):
                                                         default_name)
         return templatePath
 
-    def startLog(self, logPath):
+    def startLog(self, logPath, channel):
         self.log.info('Starting new log file: %s.' % logPath)
         templatePath = self.getTemplatePath('header')
         self.log.debug('Using header template from %s.' % templatePath)
         shutil.copyfile(templatePath, logPath)
         with open(logPath, encoding='utf-8', mode='a'+bin_mode) as logFile:
-            logFile.write("<h2>Daily Log</h2>\n")
+            logFile.write("<h2>Daily Log for %s</h2>\n" %(channel))
 
     def generateIndex(self, logDir, channel):
         self.log.info('Generating a new index.html in %s.' % logDir)
@@ -160,7 +160,7 @@ class HtmlLogger(callbacks.Plugin):
         logFiles.sort(reverse=True)
         logURL = self.registryValue("logURL")
         with open(indexPath, encoding='utf-8', mode='a'+bin_mode) as indexFile:
-            indexFile.write("<h2>Daily Logs</h2>\n")
+            indexFile.write("<h2>Daily Logs for %s</h2>\n" %(channel))
             indexFile.write("<ul>\n")
             for f in logFiles:
                 datename = f[len(file_prefix)+len(channel)+2:-(len(file_suffix)+1)]
@@ -261,7 +261,7 @@ class HtmlLogger(callbacks.Plugin):
                 logDir = self.getLogDir(irc, channel)
                 logPath = os.path.join(logDir, name)
                 if not os.path.isfile(logPath):
-                    self.startLog(logPath)
+                    self.startLog(logPath, channel)
                     # Clean up old log files
                     number2keep = self.registryValue('deleteOldLogs', channel)
                     if number2keep > 0:
