@@ -62,7 +62,7 @@ except:
     internationalizeDocstring = lambda x:x
 
 # This regex doesn't match every URL, but it is simple and gets most.
-url_regex = re.compile("\s*([fhtps]{3,5}://\S+)\s*")
+url_regex = re.compile("(\s*)([fhtps]{3,5}://\S+)(\s*)")
 
 file_prefix = "log"
 file_suffix = "html"
@@ -300,7 +300,7 @@ class HtmlLogger(callbacks.Plugin):
 
     def linkify(self, message):
         '''Enclose all URLs in the message with an href.'''
-        return url_regex.sub(r'<a href="\1">\1</a>', message)
+        return url_regex.sub(r'\1<a href="\2">\2</a>\3', message)
 
     def doLog(self, irc, channel, notice, nick, s, *args):
         ''' notice: Boolean. True if message should be styled as a notice. '''
