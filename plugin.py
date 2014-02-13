@@ -147,7 +147,7 @@ class HtmlLogger(callbacks.Plugin):
         with open(logPath, encoding='utf-8', mode='a'+bin_mode) as logFile:
             logFile.write("<h2>Daily Log</h2>\n")
 
-    def generateIndex(self, logDir):
+    def generateIndex(self, logDir, channel):
         self.log.info('Generating a new index.html in %s.' % logDir)
         templatePath = self.getTemplatePath('header')
         self.log.debug('Using header template from %s.' % templatePath)
@@ -163,7 +163,9 @@ class HtmlLogger(callbacks.Plugin):
             indexFile.write("<h2>Daily Logs</h2>\n")
             indexFile.write("<ul>\n")
             for f in logFiles:
-                indexFile.write('\t<li><a href="%s/%s">%s</a></li>\n' %(logURL,f,f))
+                datename = f[len(file_prefix)+len(channel)+2:-(len(file_suffix)+1)]
+                indexFile.write('\t<li><a href="%s/%s">%s</a></li>\n'
+                                %(logURL,f,datename))
             indexFile.write("</ul>")
             indexFile.write("</html>\n</body>")
 
@@ -265,7 +267,7 @@ class HtmlLogger(callbacks.Plugin):
                     if number2keep > 0:
                         self.deleteOldLogs(irc, channel, number2keep)
                     # Generate a new index file
-                    self.generateIndex(logDir)
+                    self.generateIndex(logDir, channel)
                 else: # Remove the footer if it is there
                     # This will not work with huge log files
                     with open(logPath, encoding='utf-8', mode='r'+bin_mode) as logFile:
