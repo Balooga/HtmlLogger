@@ -139,6 +139,21 @@ class HtmlLogger(callbacks.Plugin):
                                                         default_name)
         return templatePath
 
+    def channel2URL(self, channel_name):
+        ''' Some characters are not allowed in URLs, and so must be
+            substituted.
+            Every reference to the log file name should be processed by this
+            function so that the log file can be linked in the URL.
+        '''
+        urlFriendly = channel_name
+        # The hash character in the last segment of a URL directs the browser to
+        # an anchor in the page.
+        if channel_name.startswith('##'):
+            urlFriendly = channel_name.replace('##', 'hashhash_', 1)
+        elif channel_name.startswith('#'):
+            urlFriendly = channel_name.replace('#', 'hash_', 1)
+        return urlFriendly
+
     def startLog(self, logPath, channel):
         self.log.info('Starting new log file: %s.' % logPath)
         templatePath = self.getTemplatePath('header')
@@ -168,7 +183,8 @@ class HtmlLogger(callbacks.Plugin):
         with open(indexPath, encoding='utf-8', mode='a'+bin_mode) as indexFile:
             indexFile.write("<h2>Daily Logs for %s</h2>\n" %(channel))
             for f in logFiles:
-                datename = f[len(file_prefix)+len(channel)+2:-(len(file_suffix)+1)]
+                datename = f[len(file_prefix)+len(self.channel2URL(channel))+2
+                             :-(len(file_suffix)+1)]
                 if simple_split_months and datename[0:7] != lastmonth:
                     monthstring = datename[0:7]
                     if lastmonth == '': # First time through
@@ -213,10 +229,10 @@ class HtmlLogger(callbacks.Plugin):
 
     def getLogName(self, channel):
         if self.registryValue('rotateLogs', channel):
-            return '%s_%s_%s.%s' % (file_prefix, channel,
+            return '%s_%s_%s.%s' % (file_prefix, self.channel2URL(channel),
                                     self.logNameTimestamp(channel), file_suffix)
         else:
-            return '%s_%s.%s' % (file_prefix, channel, file_suffix)
+            return '%s_%s.%s' % (file_prefix, self.channel2URL(channel), file_suffix)
 
     def getLogDir(self, irc, channel):
         logDir = conf.supybot.directories.log.dirize(self.name())
