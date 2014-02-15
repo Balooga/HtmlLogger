@@ -85,7 +85,7 @@ conf.registerGlobalValue(HtmlLogger, 'networkDirectory',
     directories of channel logs into separate network directories.""")))
 conf.registerGlobalValue(HtmlLogger, 'logURL',
     registry.String('', _("""URL of the directory where log files will be
-    publicly accessible.""")))
+    publicly accessible. Leave it blank for a relative URL.""")))
 conf.registerGlobalValue(HtmlLogger, 'headerFile',
     registry.String('', _("""Location of the HTML header to wrap around a log
     file. If none is specified, the default header included with the plugin will be

@@ -180,6 +180,7 @@ class HtmlLogger(callbacks.Plugin):
                            and f.endswith("."+file_suffix)]
         logFiles.sort(reverse=True)
         logURL = self.registryValue("logURL")
+        if logURL != '': logURL = logURL + '/'
         # Separate logs by month, but only if the filename date format is what we expect
         filename_timeformat = self.registryValue('filenameTimestamp', channel)
         simple_split_months = False
@@ -199,7 +200,7 @@ class HtmlLogger(callbacks.Plugin):
                     else:
                         indexFile.write('</ul>\n<h3>%s</h3>\n<ul>\n'%(monthstring))
                     lastmonth = monthstring
-                indexFile.write('\t<li><a href="%s/%s">%s</a></li>\n'
+                indexFile.write('\t<li><a href="%s%s">%s</a></li>\n'
                                 %(logURL,f,datename))
             indexFile.write("</ul>\n")
             indexFile.write(footerString)
