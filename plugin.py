@@ -155,9 +155,9 @@ class HtmlLogger(callbacks.Plugin):
         # The hash character in the last segment of a URL directs the browser to
         # an anchor in the page.
         if channel_name.startswith('##'):
-            urlFriendly = channel_name.replace('##', 'hashhash_', 1)
+            urlFriendly = channel_name.replace('##', 'hashhash-', 1)
         elif channel_name.startswith('#'):
-            urlFriendly = channel_name.replace('#', 'hash_', 1)
+            urlFriendly = channel_name.replace('#', 'hash-', 1)
         return urlFriendly
 
     def startLog(self, logPath, channel):
