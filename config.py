@@ -86,15 +86,22 @@ conf.registerGlobalValue(HtmlLogger, 'networkDirectory',
 conf.registerGlobalValue(HtmlLogger, 'logURL',
     registry.String('', _("""URL of the directory where log files will be
     publicly accessible.""")))
-conf.registerGlobalValue(HtmlLogger, 'headerfile',
+conf.registerGlobalValue(HtmlLogger, 'headerFile',
     registry.String('', _("""Location of the HTML header to wrap around a log
     file. If none is specified, the default header included with the plugin will be
     used.""")))
-conf.registerGlobalValue(HtmlLogger, 'footerfile',
+conf.registerGlobalValue(HtmlLogger, 'footerFile',
     registry.String('', _("""Location of the HTML footer to wrap around a log
     file. If none is specified, the default footer included with the plugin will be
     used.""")))
-
+conf.registerGlobalValue(HtmlLogger, 'indexHeaderFile',
+    registry.String('', _("""Location of the HTML header to wrap around the
+    index page for the log files. If none is specified, the default header included with
+    the plugin will be used.""")))
+conf.registerGlobalValue(HtmlLogger, 'indexFooterFile',
+    registry.String('', _("""Location of the HTML footer to wrap around the
+    index page for the log files. If none is specified, the default footer included with
+    the plugin will be used.""")))
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

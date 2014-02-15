@@ -128,10 +128,16 @@ class HtmlLogger(callbacks.Plugin):
         registry_value = ''
         default_name = ''
         if template_name == 'header':
-            registry_value = 'headerfile'
+            registry_value = 'headerFile'
             default_name = 'header.html'
         elif template_name == 'footer':
-            registry_value = 'footerfile'
+            registry_value = 'footerFile'
+            default_name = 'footer.html'
+        if template_name == 'indexHeader':
+            registry_value = 'indexHeaderFile'
+            default_name = 'header.html'
+        elif template_name == 'indexFooter':
+            registry_value = 'indexFooterFile'
             default_name = 'footer.html'
         templatePath = self.registryValue(registry_value)
         if templatePath == '':
@@ -164,7 +170,7 @@ class HtmlLogger(callbacks.Plugin):
 
     def generateIndex(self, logDir, channel):
         self.log.info('Generating a new index.html in %s.' % logDir)
-        templatePath = self.getTemplatePath('header')
+        templatePath = self.getTemplatePath('indexHeader')
         self.log.debug('Using header template from %s.' % templatePath)
         indexPath = os.path.join(logDir, 'index.html')
         shutil.copyfile(templatePath, indexPath)
@@ -180,6 +186,7 @@ class HtmlLogger(callbacks.Plugin):
         lastmonth = ''
         if filename_timeformat == "%Y-%m-%d":
             simple_split_months = True
+        footerString = self.getFooter('indexFooter')
         with open(indexPath, encoding='utf-8', mode='a'+bin_mode) as indexFile:
             indexFile.write("<h2>Daily Logs for %s</h2>\n" %(channel))
             for f in logFiles:
@@ -194,14 +201,14 @@ class HtmlLogger(callbacks.Plugin):
                     lastmonth = monthstring
                 indexFile.write('\t<li><a href="%s/%s">%s</a></li>\n'
                                 %(logURL,f,datename))
-            indexFile.write("</ul>")
-            indexFile.write("</html>\n</body>")
+            indexFile.write("</ul>\n")
+            indexFile.write(footerString)
 
-    def getFooter(self):
+    def getFooter(self, templateName = 'footer'):
         ''' Reads the footer, and returns it as a string for appending to the
             log file.
         '''
-        templatePath = self.getTemplatePath('footer')
+        templatePath = self.getTemplatePath(templateName)
         self.log.debug('Using footer template from %s.' % templatePath)
         footerString = ''
         with open(templatePath, encoding='utf-8', mode='r'+bin_mode) as footerFile:
