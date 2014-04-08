@@ -52,6 +52,7 @@ import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.registry as registry
 import supybot.callbacks as callbacks
+import supybot.commands as commands
 try:
     from supybot.i18n import PluginInternationalization, internationalizeDocstring
     _ = PluginInternationalization('HtmlLogger')
@@ -353,6 +354,22 @@ class HtmlLogger(callbacks.Plugin):
         log.write('</p>\n')
         if self.registryValue('flushImmediately'):
             log.flush()
+
+    @internationalizeDocstring
+    def flush(self, irc, msg, args, channel):
+        """ Optionally provide a channel, otherwise defaults to the current channel
+        
+        Make certain the latest information is saved to the filesystem.
+        """
+        if not self.registryValue('enable', channel):
+            irc.reply("The channel [{0}] is not enabled, so no nead to flush your logs...".format(channel))
+            return
+        channel = self.normalizeChannel(irc, channel)
+        log = self.getLog(irc, channel)
+        log.flush()
+        irc.reply("Woooosh, your log has been flushed...")
+    flush = commands.wrap(flush, [commands.optional('channel')])
+
 
     def doPrivmsg(self, irc, msg):
         (recipients, text) = msg.args
