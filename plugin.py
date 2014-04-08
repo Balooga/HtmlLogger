@@ -356,11 +356,14 @@ class HtmlLogger(callbacks.Plugin):
             log.flush()
 
     @internationalizeDocstring
-    def flush(self, irc, msg, args, channel):
+    def flushlog(self, irc, msg, args, channel):
         """ Optionally provide a channel, otherwise defaults to the current channel
         
         Make certain the latest information is saved to the filesystem.
         """
+        if not channel:
+            irc.reply("There is no default channel here, you can add a channel name to this command...")
+            return
         if not self.registryValue('enable', channel):
             irc.reply("The channel [{0}] is not enabled, so no nead to flush your logs...".format(channel))
             return
@@ -368,7 +371,7 @@ class HtmlLogger(callbacks.Plugin):
         log = self.getLog(irc, channel)
         log.flush()
         irc.reply("Woooosh, your log has been flushed...")
-    flush = commands.wrap(flush, [commands.optional('channel')])
+    flushlog = commands.wrap(flushlog, [commands.optional('channel')])
 
 
     def doPrivmsg(self, irc, msg):
