@@ -10,6 +10,9 @@ An improved ChannelLogger:
 * All times are in UTC
 * Turns URLs into links
 
+Commands:
+* flushlog: force a flush to disk
+
 Notes:
 * Tested with Limnoria and Python 3.2, and Supybot and Python 2.7.
 * Currently the same header and footer templates are used for all channels
