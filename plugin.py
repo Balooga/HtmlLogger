@@ -213,7 +213,7 @@ class HtmlLogger(callbacks.Plugin):
         templatePath = self.getTemplatePath(templateName)
         self.log.debug('Using footer template from %s.' % templatePath)
         footerString = ''
-        with open(templatePath, encoding='utf-8', mode='r'+bin_mode) as footerFile:
+        with open(templatePath, mode='r'+bin_mode) as footerFile:
             footerString = footerFile.read()
         return footerString
 
@@ -301,13 +301,13 @@ class HtmlLogger(callbacks.Plugin):
                     self.generateIndex(logDir, channel)
                 else: # Remove the footer if it is there
                     # This will not work with huge log files
-                    with open(logPath, encoding='utf-8', mode='r'+bin_mode) as logFile:
+                    with open(logPath, mode='r'+bin_mode) as logFile:
                         logFileString = logFile.read()
                     footerString = self.getFooter()
                     if logFileString.endswith(footerString):
-                        with open(logPath, encoding='utf-8', mode='w'+bin_mode) as logFile:
+                        with open(logPath, mode='w'+bin_mode) as logFile:
                             logFile.write(logFileString[:-len(footerString)])
-                log = open(logPath, encoding='utf-8', mode='a'+bin_mode)
+                log = open(logPath, mode='a'+bin_mode)
                 logs[channel] = log
                 return log
             except IOError:
